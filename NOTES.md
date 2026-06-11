@@ -13,7 +13,11 @@
 - Para actualizar el sitio: `git push` y listo (Pages re-despliega desde `main`).
 
 ## Estado de publicación
-- (Se completa al crear el repo) — nombre, URL de Pages, visibilidad.
+- **Repo:** https://github.com/frandsr/github-actions-learning (público, cuenta personal `frandsr`).
+- **Sitio (Pages):** https://frandsr.github.io/github-actions-learning/ — verificado HTTP 200.
+- **Cuenta:** personal `frandsr` (NO la laboral `fdesautu-mundi`). La activa en `gh` ya es la personal.
+- **Actualizar el sitio:** `git push` a `main` → Pages re-despliega solo (branch=main, path=/).
+- El commit usó email francisco.desauturiestra@mundi.io; si querés un email personal en los commits, avisame y lo cambio.
 
 ## Stack para ejemplos
 - Node/TypeScript como default en los ejemplos.
