@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprendiendo GitHub Actions</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --text:#e6edf3;
+    --muted:#9da7b3; --accent:#58a6ff; --green:#3fb950;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;padding:2.5rem 1rem 4rem}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:2rem;margin:0 0 .3rem}
+  .sub{color:var(--muted);margin:0 0 2rem}
+  a{color:var(--accent);text-decoration:none}
+  .lesson{display:block;background:var(--panel);border:1px solid var(--border);
+    border-radius:12px;padding:1.1rem 1.3rem;margin:.8rem 0;transition:border-color .15s,transform .1s}
+  .lesson:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .lesson .n{color:var(--green);font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+  .lesson .t{font-size:1.15rem;font-weight:600;margin:.2rem 0;color:var(--text)}
+  .lesson .d{color:var(--muted);font-size:.92rem;margin:0}
+  .lesson.soon{opacity:.55;cursor:default}
+  .lesson.soon:hover{border-color:var(--border);transform:none}
+  .meta{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--border);color:var(--muted);font-size:.88rem}
+  .refs a{display:inline-block;margin-right:1rem}
+  .badge{display:inline-block;background:#1c2333;border:1px solid var(--accent);color:var(--accent);
+    border-radius:20px;padding:.15rem .7rem;font-size:.75rem;margin-left:.5rem;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>⚙️ Aprendiendo GitHub Actions</h1>
+  <p class="sub">CI/CD desde cero hasta nivel básico/medio. Concepto primero, después la práctica. Una victoria tangible por lección.</p>
+
+  <a class="lesson" href="lessons/0001-modelo-mental.html">
+    <div class="n">Lección 1 · Disponible</div>
+    <div class="t">El modelo mental de GitHub Actions</div>
+    <p class="d">Cómo un EVENTO dispara JOBS en un RUNNER, compuestos de STEPS que usan ACTIONS. Incluye quiz interactivo de 3 preguntas.</p>
+  </a>
+
+  <div class="lesson soon">
+    <div class="n">Lección 2 · Próximamente</div>
+    <div class="t">Tu primer workflow de CI para Node/TypeScript</div>
+    <p class="d">Escribir el YAML: checkout, setup-node, instalar deps y correr tests en cada push.</p>
+  </div>
+
+  <div class="refs meta">
+    <strong>Referencia rápida</strong><br>
+    <a href="reference/glossary.html">📖 Glosario de GitHub Actions</a>
+  </div>
+
+  <div class="meta">
+    Workspace de aprendizaje personal. Las lecciones se basan en las <a href="https://docs.github.com/en/actions">docs oficiales de GitHub Actions</a> y citan las fuentes inline.<br>
+    Para actualizar el sitio: <code>git push</code> a <code>main</code> y GitHub Pages re-despliega solo.
+  </div>
+</div>
+</body>
+</html>

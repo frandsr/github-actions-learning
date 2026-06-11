@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lección 1 — El modelo mental de GitHub Actions</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --text:#e6edf3;
+    --muted:#9da7b3; --accent:#58a6ff; --green:#3fb950; --red:#f85149;
+    --amber:#d29922; --code:#c9d1d9; --codebg:#0b0f14;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;padding:2rem 1rem 4rem;}
+  .wrap{max-width:760px;margin:0 auto}
+  .nav{font-size:.9rem;margin-bottom:1.2rem}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  .kicker{color:var(--green);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:.78rem;margin:0}
+  h1{font-size:1.85rem;line-height:1.2;margin:.3rem 0 .6rem}
+  .lede{color:var(--muted);font-size:1.05rem;margin:0 0 1.5rem}
+  h2{font-size:1.25rem;margin:2rem 0 .6rem;padding-top:.4rem}
+  h3{font-size:1.05rem;margin:1.4rem 0 .4rem;color:var(--accent)}
+  p{margin:.6rem 0}
+  code{background:var(--codebg);border:1px solid var(--border);border-radius:5px;
+    padding:.1rem .35rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;color:var(--code)}
+  pre{background:var(--codebg);border:1px solid var(--border);border-radius:10px;
+    padding:1rem;overflow-x:auto;font-size:.82rem}
+  pre code{border:0;padding:0;background:none}
+  .win{background:linear-gradient(135deg,#11261a,#0d1117);border:1px solid var(--green);
+    border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0}
+  .win strong{color:var(--green)}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;margin:1rem 0}
+  .cite{font-size:.82rem;color:var(--muted)}
+  .cite a{color:var(--accent)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin:1rem 0;font-size:.9rem}
+  .pill{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:.35rem .8rem;white-space:nowrap}
+  .pill b{color:var(--accent)}
+  .arrow{color:var(--muted)}
+  table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.9rem}
+  th,td{border:1px solid var(--border);padding:.5rem .7rem;text-align:left;vertical-align:top}
+  th{background:var(--panel);color:var(--accent)}
+
+  /* Quiz */
+  .quiz{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin:1.2rem 0}
+  .q{margin-bottom:1.4rem}
+  .q:last-child{margin-bottom:0}
+  .q .qtext{font-weight:600;margin-bottom:.7rem}
+  .opt{display:block;width:100%;text-align:left;background:var(--codebg);color:var(--text);
+    border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;margin:.4rem 0;
+    cursor:pointer;font-size:.95rem;transition:border-color .15s,background .15s;font-family:inherit}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--green);background:#11261a}
+  .opt.wrong{border-color:var(--red);background:#2a1416}
+  .opt:disabled{cursor:default;opacity:.95}
+  .fb{margin-top:.6rem;font-size:.9rem;padding:.6rem .8rem;border-radius:8px;display:none}
+  .fb.show{display:block}
+  .fb.ok{background:#11261a;border:1px solid var(--green)}
+  .fb.no{background:#2a1416;border:1px solid var(--red)}
+  .score{font-size:1.1rem;font-weight:600;margin-top:1rem;text-align:center;display:none}
+  .score.show{display:block}
+  footer{margin-top:2.5rem;padding-top:1.2rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
+  .ask{background:#1c2333;border:1px solid var(--accent);border-radius:10px;padding:.9rem 1.1rem;margin:1.5rem 0;font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><a href="../index.html">← Índice</a> · <a href="../reference/glossary.html">Glosario ↗</a></div>
+
+  <p class="kicker">Lección 1 · Modelo mental</p>
+  <h1>Qué pasa realmente cuando GitHub Actions "corre algo"</h1>
+  <p class="lede">Antes de escribir una sola línea de YAML, necesitás el modelo mental. Si entendés cómo encajan las 5 piezas, el YAML después es solo rellenar el formulario.</p>
+
+  <div class="win">
+    <strong>🏆 Tu victoria de hoy:</strong> vas a poder mirar cualquier workflow y decir en voz alta "esto se dispara por <em>tal evento</em>, corre <em>estos jobs</em> en <em>tal runner</em>, y cada job hace <em>estos steps</em>" — sin tocar la sintaxis todavía.
+  </div>
+
+  <h2>El problema que resuelve (el "por qué")</h2>
+  <p>Vos ya hacés cosas a mano cada vez que tocás el código: correr los tests, pasar el linter, buildear, a veces publicar. Eso es trabajo repetitivo, fácil de olvidar y fácil de hacer mal. CI/CD es la idea de que <strong>una máquina haga esas tareas automáticamente cada vez que pasa algo en tu repo</strong>.</p>
+  <p>GitHub Actions es el sistema de GitHub para eso: vos describís "cuándo" y "qué", y GitHub se encarga de levantar una máquina y ejecutarlo. Nada más. Todo el vocabulario que sigue son nombres para las partes de esa frase.</p>
+
+  <h2>Las 5 piezas (y cómo se enganchan)</h2>
+
+  <div class="flow">
+    <span class="pill"><b>Event</b></span><span class="arrow">→ dispara →</span>
+    <span class="pill"><b>Workflow</b></span><span class="arrow">→ contiene →</span>
+    <span class="pill"><b>Jobs</b></span><span class="arrow">→ corren en →</span>
+    <span class="pill"><b>Runner</b></span>
+    <span class="arrow">; cada job =</span>
+    <span class="pill"><b>Steps</b></span><span class="arrow">→ usan →</span>
+    <span class="pill"><b>Actions</b></span>
+  </div>
+
+  <h3>1. Event — el disparador</h3>
+  <p>Algo pasa en tu repo: un <code>push</code>, alguien abre un <code>pull_request</code>, llega un horario programado (<code>schedule</code>), o apretás un botón para correrlo a mano (<code>workflow_dispatch</code>). GitHub lo detecta y se pregunta: "¿hay algún workflow que reaccione a esto?".</p>
+  <p class="cite">Oficial: <em>"A specific activity in a repository that triggers a workflow run."</em> — <a href="https://docs.github.com/en/actions/get-started/understanding-github-actions">Understanding GitHub Actions</a></p>
+
+  <h3>2. Workflow — la receta</h3>
+  <p>Un archivo YAML que vive en <code>.github/workflows/</code> de tu repo. Dice: "cuando pase <em>este evento</em>, hacé <em>estos jobs</em>". Un repo puede tener muchos workflows (uno para tests, otro para deploy, otro para un cron nocturno).</p>
+  <p class="cite">Oficial: <em>"A configurable automated process that will run one or more jobs."</em> — <a href="https://docs.github.com/en/actions/concepts/workflows-and-actions/about-workflows">About workflows</a></p>
+
+  <h3>3. Jobs — las tareas grandes</h3>
+  <p>Un workflow se divide en jobs. Cada job es una unidad de trabajo (ej: "test", "build", "deploy"). <strong>Por defecto los jobs corren en paralelo</strong> y cada uno arranca en una máquina limpia y aislada. Si querés que uno espere a otro, se lo decís explícitamente.</p>
+  <p class="cite">Oficial: <em>"A set of steps in a workflow that is executed on the same runner."</em> — <a href="https://docs.github.com/en/actions/get-started/understanding-github-actions">Understanding GitHub Actions</a></p>
+
+  <h3>4. Runner — la máquina</h3>
+  <p>El servidor donde corre un job. GitHub te presta máquinas con Ubuntu, Windows o macOS ya instaladas. Cada job pide su runner (ej: <code>runs-on: ubuntu-latest</code>). Cuando el job termina, la máquina se descarta — no hay estado que sobreviva entre runs.</p>
+  <p class="cite">Oficial: <em>"A server that runs your workflows when they're triggered."</em> — <a href="https://docs.github.com/en/actions/get-started/understanding-github-actions">Understanding GitHub Actions</a></p>
+
+  <h3>5. Steps + Actions — los pasos concretos</h3>
+  <p>Dentro de un job, los steps se ejecutan <strong>en orden, uno tras otro</strong>, compartiendo la misma máquina. Cada step hace una de dos cosas:</p>
+  <table>
+    <tr><th>Tipo de step</th><th>Cómo se escribe</th><th>Ejemplo</th></tr>
+    <tr><td>Corre un comando de shell</td><td><code>run:</code></td><td><code>run: npm test</code></td></tr>
+    <tr><td>Usa una <b>Action</b> reutilizable</td><td><code>uses:</code></td><td><code>uses: actions/checkout@v4</code></td></tr>
+  </table>
+  <p>Una <strong>Action</strong> es lógica empaquetada que alguien ya escribió para que vos no la repitas: clonar tu repo, instalar Node, cachear dependencias. Es la pieza "reutilizable" del sistema.</p>
+  <p class="cite">Oficial: <em>"A reusable extension that can simplify your workflow."</em> — <a href="https://docs.github.com/en/actions/get-started/understanding-github-actions">Understanding GitHub Actions</a> · Glosario completo: <a href="../reference/glossary.html">ver acá</a></p>
+
+  <h2>Cómo se ve junto (mirá, no memorices)</h2>
+  <p>No te pido escribir esto todavía. Solo leelo y reconocé las 5 piezas:</p>
+<pre><code>name: CI                      # nombre del workflow
+on: [push, pull_request]      # 1) EVENT: cuándo se dispara
+
+jobs:
+  test:                       # 3) JOB llamado "test"
+    runs-on: ubuntu-latest    # 4) RUNNER: máquina Ubuntu
+    steps:                    # 5) STEPS, en orden:
+      - uses: actions/checkout@v4   # ACTION: clona tu repo
+      - run: npm ci                 # comando shell: instala deps
+      - run: npm test               # comando shell: corre tests
+</code></pre>
+  <p>Todo el archivo es el <strong>workflow</strong>. ¿Lo leíste y ubicaste cada pieza? Entonces ya cumpliste la victoria de hoy. Probemos con el quiz.</p>
+
+  <h2>Quiz — 3 preguntas, feedback al instante</h2>
+  <div class="quiz" id="quiz">
+    <div class="q" data-correct="b">
+      <div class="qtext">1. Abrís un Pull Request y se dispara un workflow. ¿Qué pieza del modelo representa "abrir el PR"?</div>
+      <button class="opt" data-k="a">El runner, porque es donde empieza todo</button>
+      <button class="opt" data-k="b">El event, que es la actividad del repo que dispara el workflow</button>
+      <button class="opt" data-k="c">Un step, porque es la primera acción que ocurre</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="c">
+      <div class="qtext">2. Un job tiene tres steps: checkout, instalar deps, correr tests. ¿Qué es verdad sobre cómo corren?</div>
+      <button class="opt" data-k="a">Corren en paralelo, cada uno en su propia máquina</button>
+      <button class="opt" data-k="b">Cada step elige su propio runner por separado</button>
+      <button class="opt" data-k="c">Corren en orden, uno tras otro, en el mismo runner compartido</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="q" data-correct="a">
+      <div class="qtext">3. En un step ves <code>uses: actions/setup-node@v4</code>. ¿Qué te dice ese <code>uses:</code>?</div>
+      <button class="opt" data-k="a">Que el step invoca una action reutilizable hecha por otros, en vez de un comando shell propio</button>
+      <button class="opt" data-k="b">Que el step va a correr un script de shell llamado setup-node</button>
+      <button class="opt" data-k="c">Que define un nuevo runner basado en Node</button>
+      <div class="fb"></div>
+    </div>
+
+    <div class="score" id="score"></div>
+  </div>
+
+  <div class="ask">
+    💬 <strong>Tu tutor sos vos + el agente.</strong> ¿Algo no te cerró — por qué los jobs corren aislados, qué es <code>@v4</code>, cuándo conviene <code>push</code> vs <code>pull_request</code>? Preguntámelo en el chat. Para eso estoy.
+  </div>
+
+  <h2>📖 Fuente primaria recomendada</h2>
+  <div class="card">
+    <p style="margin:0"><strong>Leé:</strong> <a href="https://docs.github.com/en/actions/get-started/understanding-github-actions">GitHub Docs — Understanding GitHub Actions</a></p>
+    <p style="margin:.4rem 0 0;color:var(--muted)">Es la página de la que salieron todas las definiciones de esta lección. 5 minutos. Es la fuente canónica: cuando dudes de un término, esta es la verdad.</p>
+  </div>
+
+  <h2>Próximo paso</h2>
+  <p>En la <strong>Lección 2</strong> vas a escribir (no solo leer) tu primer workflow de CI para un proyecto Node/TypeScript: checkout, <code>setup-node</code>, instalar deps y correr tests. Tu primera receta funcionando de verdad.</p>
+
+  <footer>
+    Workspace de aprendizaje de GitHub Actions · Lección 1 de la serie.<br>
+    Fuentes oficiales citadas inline. Para actualizar este sitio: <code>git push</code>.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var qs = document.querySelectorAll('#quiz .q');
+  var answered = 0, correctCount = 0;
+  qs.forEach(function(q){
+    var correct = q.getAttribute('data-correct');
+    var fb = q.querySelector('.fb');
+    var opts = q.querySelectorAll('.opt');
+    opts.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(q.dataset.done) return;
+        q.dataset.done = "1";
+        answered++;
+        var k = btn.getAttribute('data-k');
+        var ok = (k === correct);
+        if(ok) correctCount++;
+        opts.forEach(function(b){
+          b.disabled = true;
+          if(b.getAttribute('data-k') === correct) b.classList.add('correct');
+          else if(b === btn) b.classList.add('wrong');
+        });
+        fb.classList.add('show', ok ? 'ok' : 'no');
+        var msgs = {
+          0: ok ? "✅ Exacto. El event es la actividad del repo (push, PR, schedule…) que dispara el workflow. El runner recién aparece después, cuando ya se decidió correr un job."
+                : "❌ El event es la actividad que dispara el workflow — abrir el PR ES el evento. El runner es la máquina que recién se levanta después de que GitHub decide correr un job.",
+          1: ok ? "✅ Correcto. Los STEPS de un mismo job corren secuencialmente en el MISMO runner (comparten archivos). Lo que corre en paralelo y aislado son los JOBS entre sí, no los steps."
+                : "❌ Cuidado con la confusión clásica: los STEPS corren en orden y comparten un runner. Lo que corre en paralelo y en máquinas separadas son los JOBS entre sí.",
+          2: ok ? "✅ Eso es. uses: invoca una action reutilizable (lógica empaquetada por otros). run: sería para un comando de shell. No define runners."
+                : "❌ uses: significa 'usá esta action reutilizable'. Un comando de shell iría con run:. Y el runner se define con runs-on:, no con uses:."
+        };
+        var idx = Array.prototype.indexOf.call(qs, q);
+        fb.textContent = msgs[idx];
+        if(answered === qs.length){
+          var s = document.getElementById('score');
+          s.classList.add('show');
+          var line = correctCount === 3 ? "🎉 3/3 — tenés el modelo mental. Listo para escribir YAML en la Lección 2."
+                   : correctCount === 2 ? "👍 2/3 — muy bien. Releé el feedback de la que erraste y vas a quedar redondo."
+                   : "🌱 " + correctCount + "/3 — repasá la sección de las 5 piezas y el glosario; no hay apuro, el modelo mental es la base de todo lo demás.";
+          s.textContent = "Puntaje: " + correctCount + "/3 · " + line;
+        }
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
